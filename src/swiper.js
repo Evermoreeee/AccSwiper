@@ -2,7 +2,7 @@
 export default class AccSwiper {
     constructor(options = {}) {
         this.options = Object.assign({
-            swiper: '#swiper',
+            swiper: options.id,
             item: '.swiper-name',
             autoplay: false,
             duration: 3000
