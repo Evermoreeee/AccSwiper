@@ -120,7 +120,12 @@ export default {
             swiper: '#swiper',      
             item: '.swiper-item',
       });
-
+      new Swiper({
+            swiper: '.swiper-menus',
+            item: '.swiper-item',
+            autoplay: true,
+            duration: 5000
+    });
     }
   }
 }

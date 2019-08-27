@@ -2,25 +2,25 @@
 export default class AccSwiper {
     constructor(options = {}) {
         this.options = Object.assign({
-            swiper: options.id,
+            swiper: '#swiper',
             item: '.swiper-name',
             autoplay: false,
-            duration: 3000
         }, options);
-        
+
+        // console.log(this.options)
+
         // 所有的Element对象和集合
         this.elements = {
             swiper: document.querySelector(this.options.swiper),
             items: null,
             container: null,
         };
-
+        // console.log(this.elements)
         // 一些状态
         this.states = {
             index: 0,           // 当前滑块的下标，从0开始
             left: 0,            // container的一个left位置
             touch: 0,           // 触摸状态 0：未触摸 1：手指触摸/鼠标按下
-            autoplay: this.options.autoplay,
             touchTrack: {
                 start: null,    // 手指触摸/鼠标按下时的位置
                 old: null,      // 手指/鼠标上一次的位置
@@ -50,10 +50,10 @@ export default class AccSwiper {
 
         //resetTouchStatus
         this.direction = '';
-        this.deltaX = 0;
-        this.deltaY = 0;
-        this.offsetX = 0;
-        this.offsetY = 0;
+        
+        ['deltaX','deltaY','offsetX','offsetY'].forEach(item => {
+            this[item] = 0
+        })
     }
     
     /**
@@ -107,7 +107,7 @@ export default class AccSwiper {
 
         this.resetTouchStatus()
         // 阻止浏览器默认的拖拽行为
-        // // event.preventDefault();
+        // event.preventDefault();
 
         this.states.touch = 1;
         this.states.autoplay = false;
@@ -119,7 +119,7 @@ export default class AccSwiper {
     }
    
     getDirection(x, y) {
-        const MIN_DISTANCE = 10
+        const MIN_DISTANCE = 5
         if (x > y && x > MIN_DISTANCE) {
           return 'horizontal';
         }
@@ -166,10 +166,13 @@ export default class AccSwiper {
             this.states.left += event.pageX - this.states.touchTrack.old.pageX;
         }
         this.states.touchTrack.old = event;
-        this.elements.container.style.left = this.states.left + 'px';
+        // this.elements.container.style.left = this.states.left + 'px';
+        this.elements.container.style.transform = 'translateX'+ "(" + this.states.left + "px)";
+
     }
 
     touchEnd(event) {
+        
         // 移除触摸状态
         this.states.touch = 0;
         this.states.autoplay = true;
@@ -188,8 +191,14 @@ export default class AccSwiper {
         else if (this.states.index > this.elements.items.length - 1) {
             this.states.index = this.elements.items.length - 1;
         }
+        if(this.direction === 'horizontal'){
 
-        this.change(this.states.index);
+            this.change(this.states.index);
+            
+        } else{
+            //垂直滚动
+            return;
+        }
     }
     resetTouchStatus() {
         this.direction = '';
@@ -201,10 +210,11 @@ export default class AccSwiper {
     change(index) {
         // 当前滑块的index乘以滑块宽度的相反数即为container的left位置。
         this.states.left =  - (this.elements.items[0].offsetWidth * index);
-        this.elements.container.style.left = this.states.left + 'px';
-
+        // this.elements.container.style.left = this.states.left + 'px';
+        console.log(this.states.left)
+        this.elements.container.style.transform = 'translateX'+ "(" + this.states.left + "px)";
         // 用transition属性实现一个左右移动动画效果
-        this.elements.container.style.cssText += `transition: left 0.2s `;
+        this.elements.container.style.cssText += `transition-duration: 0.3s`; 
         // 当动画结束后，去掉transition属性
         this.elements.container.addEventListener('transitionend', () => {
             this.elements.container.style.cssText = this.elements.container.style.cssText.replace('transition', '');
